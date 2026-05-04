@@ -8,7 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Image,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -21,23 +21,18 @@ interface AuthInputProps {
   value: string;
   onChangeText: (text: string) => void;
   secureTextEntry?: boolean;
-  hasError?: boolean;
 }
 
-const AuthInput: React.FC<AuthInputProps> = ({ label, placeholder, value, onChangeText, secureTextEntry, hasError }) => {
+const AuthInput: React.FC<AuthInputProps> = ({ label, placeholder, value, onChangeText, secureTextEntry }) => {
   const [isSecure, setIsSecure] = useState(secureTextEntry);
   const [isFocused, setIsFocused] = useState(false);
 
   return (
-    <View style={[
-      styles.inputContainer,
-      isFocused && styles.inputContainerFocused,
-      hasError && styles.inputContainerError
-    ]}>
+    <View style={[styles.inputContainer, isFocused && styles.inputContainerFocused]}>
       <View style={styles.inputContent}>
         <Text style={styles.inputLabel}>{label}</Text>
         <TextInput
-          style={[styles.textInput, hasError && styles.textInputError]}
+          style={styles.textInput}
           placeholder={placeholder}
           placeholderTextColor="#C4C4C4"
           value={value}
@@ -49,31 +44,26 @@ const AuthInput: React.FC<AuthInputProps> = ({ label, placeholder, value, onChan
       </View>
       {secureTextEntry !== undefined && (
         <TouchableOpacity style={styles.eyeIcon} onPress={() => setIsSecure(!isSecure)}>
-          <Ionicons name={isSecure ? "eye-off-outline" : "eye-outline"} size={20} color={hasError ? "#E53935" : "#8A8A9D"} />
+          <Ionicons name={isSecure ? "eye-off-outline" : "eye-outline"} size={20} color="#8A8A9D" />
         </TouchableOpacity>
       )}
     </View>
   );
 };
 
-export const LoginScreen: React.FC = () => {
+export const ResetPasswordScreen: React.FC = () => {
   const navigation = useNavigation<any>();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [hasError, setHasError] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const handleNext = () => {
-    // Simulate error logic for demonstration if password is exactly "error"
-    if (password === 'error') {
-      setHasError(true);
-      return;
-    }
-    setHasError(false);
-    navigation.navigate('Setup'); // Or Main
+    setIsModalVisible(true);
   };
 
-  const handleRegister = () => {
-    navigation.navigate('Register');
+  const handleGoToLogin = () => {
+    setIsModalVisible(false);
+    navigation.navigate('Login');
   };
 
   return (
@@ -88,15 +78,17 @@ export const LoginScreen: React.FC = () => {
           style={{ flex: 1 }}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
-          <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-            {/* Header / Logo */}
-            <View style={styles.header}>
-              <Image source={require('../../../assets/logo/Logo.png')} style={styles.logo} resizeMode="contain" />
-            </View>
+          {/* Header */}
+          <View style={styles.header}>
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+              <Ionicons name="arrow-back" size={24} color="#6B6B80" />
+            </TouchableOpacity>
+          </View>
 
+          <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
             {/* Title & Description */}
             <View style={styles.textSection}>
-              <Text style={styles.title}>Welcome back</Text>
+              <Text style={styles.title}>Reset password</Text>
               <Text style={styles.description}>
                 Lorem ipsum dolor sit amet, consectetur{'\n'}adipisicing elit, sed do eiusmod.
               </Text>
@@ -105,53 +97,46 @@ export const LoginScreen: React.FC = () => {
             {/* Form */}
             <View style={styles.formSection}>
               <AuthInput
-                label="Email"
-                placeholder="John@email.com"
-                value={email}
-                onChangeText={setEmail}
+                label="New password"
+                placeholder="-"
+                value={newPassword}
+                onChangeText={setNewPassword}
+                secureTextEntry
               />
-              
-              <View>
-                <AuthInput
-                  label="Password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChangeText={(text) => {
-                    setPassword(text);
-                    setHasError(false); // clear error when typing
-                  }}
-                  secureTextEntry
-                  hasError={hasError}
-                />
-                
-                {/* Bottom of Password Input: Error message and Forgot Password */}
-                <View style={styles.passwordFooter}>
-                  {hasError ? (
-                    <Text style={styles.errorText}>* Password didn't match</Text>
-                  ) : (
-                    <View />
-                  )}
-                  <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
-                    <Text style={styles.forgotPassword}>Forgot password?</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
+              <AuthInput
+                label="Confirm password"
+                placeholder="-"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry
+              />
             </View>
 
           </ScrollView>
 
           {/* Bottom Actions */}
           <View style={styles.bottomSection}>
-            <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-              <Text style={styles.registerText}>Register</Text>
-            </TouchableOpacity>
-            
             <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
               <Ionicons name="arrow-forward" size={24} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
       </SafeAreaView>
+
+      {/* Success Modal */}
+      <Modal visible={isModalVisible} animationType="fade" transparent={true}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>Password changed</Text>
+            <Text style={styles.modalDescription}>
+              Your password is successfully changed.{'\n'}Please try to login again.
+            </Text>
+            <TouchableOpacity style={styles.modalLoginButton} onPress={handleGoToLogin}>
+              <Text style={styles.modalLoginText}>Login</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -167,15 +152,20 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 32,
-    paddingTop: 20,
     paddingBottom: 40,
   },
   header: {
-    marginBottom: 40,
+    paddingHorizontal: 24,
+    paddingTop: 10,
+    marginBottom: 20,
   },
-  logo: {
-    width: 40,
-    height: 40,
+  backButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#F0E8F5',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   textSection: {
     marginBottom: 40,
@@ -209,9 +199,6 @@ const styles = StyleSheet.create({
   inputContainerFocused: {
     borderColor: '#B344FF',
   },
-  inputContainerError: {
-    borderColor: '#E53935',
-  },
   inputContent: {
     flex: 1,
     justifyContent: 'center',
@@ -228,46 +215,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     padding: 0,
   },
-  textInputError: {
-    color: '#E53935',
-  },
   eyeIcon: {
     padding: 8,
   },
-  passwordFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 8,
-    paddingHorizontal: 4,
-  },
-  errorText: {
-    color: '#E53935',
-    fontSize: 13,
-  },
-  forgotPassword: {
-    color: '#1E103A',
-    fontSize: 13,
-    fontWeight: '700',
-  },
   bottomSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     paddingHorizontal: 32,
     paddingBottom: 20,
-    paddingTop: 10,
-  },
-  registerButton: {
-    backgroundColor: '#F0E8F5',
-    paddingVertical: 14,
-    paddingHorizontal: 28,
-    borderRadius: 24,
-  },
-  registerText: {
-    color: '#8A8A9D',
-    fontSize: 15,
-    fontWeight: '600',
   },
   nextButton: {
     backgroundColor: '#7A47F5',
@@ -281,5 +235,51 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 8,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(230, 220, 240, 0.85)',
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
+  modalCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 32,
+    paddingTop: 32,
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#1E103A',
+    marginBottom: 12,
+  },
+  modalDescription: {
+    fontSize: 15,
+    color: '#8A8A9D',
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 32,
+  },
+  modalLoginButton: {
+    backgroundColor: '#7A47F5',
+    width: '100%',
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalLoginText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
   },
 });

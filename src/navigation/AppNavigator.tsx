@@ -11,8 +11,11 @@ import { SplashScreen } from '../screens/onboarding/SplashScreen';
 import { WelcomeScreen } from '../screens/onboarding/WelcomeScreen';
 import { RegisterScreen } from '../screens/onboarding/RegisterScreen';
 import { LoginScreen } from '../screens/onboarding/LoginScreen';
+import { ForgotPasswordScreen } from '../screens/onboarding/ForgotPasswordScreen';
 import { VerifyPhoneScreen } from '../screens/onboarding/VerifyPhoneScreen';
 import { VerifyOTPScreen } from '../screens/onboarding/VerifyOTPScreen';
+import { ResetOTPScreen } from '../screens/onboarding/ResetOTPScreen';
+import { ResetPasswordScreen } from '../screens/onboarding/ResetPasswordScreen';
 import { TermsScreen } from '../screens/onboarding/TermsScreen';
 import { SetupScreen } from '../screens/onboarding/SetupScreen';
 
@@ -62,8 +65,11 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
         <Stack.Screen name="VerifyPhone" component={VerifyPhoneScreen} />
         <Stack.Screen name="VerifyOTP" component={VerifyOTPScreen} />
+        <Stack.Screen name="ResetOTP" component={ResetOTPScreen} />
+        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
         <Stack.Screen name="Terms" component={TermsScreen} />
         <Stack.Screen name="Setup" component={SetupScreen} />
 
