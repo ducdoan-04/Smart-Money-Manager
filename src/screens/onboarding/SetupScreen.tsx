@@ -1,133 +1,274 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 
-import { palette, fontSize, fontWeight, spacing, borderRadius, gradients } from '../../theme';
-import { GlassCard } from '../../components/ui/GlassCard';
-import { Button } from '../../components/ui/Button';
 import { useSettingsStore } from '../../store';
-import { CURRENCIES } from '../../constants';
-import { CurrencyCode } from '../../types';
 
 export const SetupScreen: React.FC = () => {
   const navigation = useNavigation<any>();
-  const { setUserName, setCurrency, setOnboarded } = useSettingsStore();
+  const route = useRoute<any>();
+  const { setOnboarded } = useSettingsStore();
 
-  const [name, setName] = useState('');
-  const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>('VND');
-  const [isLoading, setIsLoading] = useState(false);
+  const { cardNumber, cardHolder, expiry, selectedColor, username, imageUri } = route.params || {};
 
-  const handleFinish = async () => {
-    setIsLoading(true);
-    await setUserName(name.trim() || 'Người dùng');
-    await setCurrency(selectedCurrency);
+  const displayCardNumber = cardNumber || '1823   5232   7453   43';
+  const displayHolder = cardHolder || 'Alesandra';
+  const displayExpiry = expiry || '04/23';
+  const displayColor = selectedColor || { id: 'orange', colors: ['#E54B6B', '#F78E48', '#F3CA2E'] };
+  
+  const displayUsername = username || 'Alesandra';
+  const displayImage = imageUri || require('../../../assets/avatars/avatar-1.jpg');
+
+  const handleExplore = async () => {
     await setOnboarded();
-    setIsLoading(false);
     navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+    <View style={styles.container}>
+      <LinearGradient
+        colors={['#FFF5F7', '#FCF8FF', '#FFFFFF']}
+        style={StyleSheet.absoluteFillObject}
+      />
+      
+      <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
         {/* Header */}
-        <Text style={styles.title}>Thiết lập ban đầu</Text>
-        <Text style={styles.subtitle}>Chỉ mất 1 phút để bắt đầu</Text>
-
-        {/* Name */}
-        <GlassCard style={styles.card}>
-          <Text style={styles.label}>Tên của bạn</Text>
-          <TextInput
-            style={styles.input}
-            value={name}
-            onChangeText={setName}
-            placeholder="VD: Nguyễn Văn A"
-            placeholderTextColor={palette.gray500}
-            autoCapitalize="words"
-          />
-        </GlassCard>
-
-        {/* Currency Picker */}
-        <Text style={styles.sectionTitle}>Chọn đơn vị tiền tệ</Text>
-        <View style={styles.currencyGrid}>
-          {CURRENCIES.map((c) => (
-            <TouchableOpacity
-              key={c.code}
-              style={[
-                styles.currencyItem,
-                selectedCurrency === c.code && styles.currencyItemActive,
-              ]}
-              onPress={() => setSelectedCurrency(c.code)}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.currencySymbol}>{c.symbol}</Text>
-              <Text style={styles.currencyCode}>{c.code}</Text>
-              <Text style={styles.currencyName} numberOfLines={1}>{c.name}</Text>
-            </TouchableOpacity>
-          ))}
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color="#6B6B80" />
+          </TouchableOpacity>
         </View>
 
-        <Button
-          label="Bắt đầu"
-          onPress={handleFinish}
-          loading={isLoading}
-          size="lg"
-          fullWidth
-          style={styles.btn}
-        />
-      </ScrollView>
-    </SafeAreaView>
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          {/* Title */}
+          <Text style={styles.title}>Your account is{'\n'}ready to use</Text>
+
+          {/* Profile Section */}
+          <View style={styles.profileSection}>
+            <View style={styles.avatarContainer}>
+              <Image source={displayImage} style={styles.avatar} />
+            </View>
+            <View style={styles.profileInfo}>
+              <Text style={styles.profileName}>{displayUsername}</Text>
+              <Text style={styles.profileEmail}>alesandra.220@gmail.com</Text>
+            </View>
+          </View>
+
+          {/* Card */}
+          <LinearGradient
+            colors={displayColor.colors.length > 1 ? displayColor.colors : [displayColor.colors[0], displayColor.colors[0]]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.card}
+          >
+            {/* Top Row */}
+            <View style={styles.cardTop}>
+              {displayColor.id !== 'purple_dark' && (
+                <View style={styles.mastercardLogo}>
+                  <View style={[styles.circle, styles.circleLeft]} />
+                  <View style={[styles.circle, styles.circleRight]} />
+                </View>
+              )}
+              {displayColor.id !== 'purple_dark' && (
+                <Text style={styles.balanceText}>$ 12,000<Text style={styles.balanceDecimals}>.00</Text></Text>
+              )}
+            </View>
+
+            {/* Card Number */}
+            <Text style={styles.cardNumber}>{displayCardNumber}</Text>
+
+            {/* Bottom Row */}
+            <View style={styles.cardBottom}>
+              <View>
+                <Text style={styles.cardLabel}>CARD HOLDER</Text>
+                <Text style={styles.cardValue}>{displayHolder}</Text>
+              </View>
+              <View style={{ alignItems: 'flex-end' }}>
+                <Text style={styles.cardLabel}>EXPIRES</Text>
+                <Text style={styles.cardValue}>{displayExpiry}</Text>
+              </View>
+            </View>
+          </LinearGradient>
+
+          {/* Help Text */}
+          <Text style={styles.helpText}>
+            *You can add more wallet by pressing add button on{'\n'}homepage and profile menu
+          </Text>
+
+        </ScrollView>
+
+        {/* Bottom Actions */}
+        <View style={styles.bottomSection}>
+          <TouchableOpacity style={styles.exploreButton} onPress={handleExplore}>
+            <Text style={styles.exploreText}>Explore</Text>
+          </TouchableOpacity>
+        </View>
+
+      </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: palette.bg100 },
-  content: { padding: spacing.xl, gap: spacing.lg, paddingBottom: 40 },
-  title: {
-    fontSize: fontSize['3xl'],
-    fontWeight: fontWeight.extraBold,
-    color: palette.white,
-    marginTop: spacing.lg,
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
   },
-  subtitle: { color: palette.gray400, fontSize: fontSize.base },
-  card: { gap: spacing.sm },
-  label: { color: palette.gray400, fontSize: fontSize.sm },
-  input: {
-    color: palette.white,
-    fontSize: fontSize.xl,
-    fontWeight: fontWeight.semiBold,
-    borderBottomWidth: 1,
-    borderBottomColor: palette.glass300,
-    paddingBottom: spacing.sm,
+  safeArea: {
+    flex: 1,
   },
-  sectionTitle: {
-    color: palette.white,
-    fontSize: fontSize.base,
-    fontWeight: fontWeight.semiBold,
-    marginTop: spacing.md,
+  header: {
+    paddingHorizontal: 24,
+    paddingTop: 10,
+    marginBottom: 20,
   },
-  currencyGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-  },
-  currencyItem: {
-    width: '30%',
-    backgroundColor: palette.glass200,
-    borderRadius: borderRadius.lg,
-    padding: spacing.md,
+  backButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#F0E8F5',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'transparent',
-    gap: 2,
+    justifyContent: 'center',
   },
-  currencyItemActive: {
-    borderColor: palette.primary100,
-    backgroundColor: `${palette.primary100}22`,
+  content: {
+    paddingHorizontal: 32,
+    paddingBottom: 40,
   },
-  currencySymbol: { color: palette.white, fontSize: fontSize.xl, fontWeight: fontWeight.bold },
-  currencyCode: { color: palette.primary200, fontSize: fontSize.sm, fontWeight: fontWeight.semiBold },
-  currencyName: { color: palette.gray400, fontSize: fontSize.xs, textAlign: 'center' },
-  btn: { marginTop: spacing.md },
+  title: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#1E103A',
+    marginBottom: 40,
+    lineHeight: 40,
+  },
+  profileSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  avatarContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    overflow: 'hidden',
+    marginRight: 16,
+    backgroundColor: '#F0E8F5',
+  },
+  avatar: {
+    width: '100%',
+    height: '100%',
+  },
+  profileInfo: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  profileName: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#1E103A',
+    marginBottom: 4,
+  },
+  profileEmail: {
+    fontSize: 14,
+    color: '#8A8A9D',
+  },
+  card: {
+    borderRadius: 24,
+    padding: 24,
+    width: '100%',
+    aspectRatio: 1.586, // standard credit card ratio
+    justifyContent: 'space-between',
+    marginBottom: 24,
+    shadowColor: '#F78E48',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  cardTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  mastercardLogo: {
+    flexDirection: 'row',
+    width: 40,
+  },
+  circle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+  },
+  circleLeft: {
+    opacity: 0.8,
+  },
+  circleRight: {
+    opacity: 0.8,
+    marginLeft: -10,
+  },
+  balanceText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  balanceDecimals: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  cardNumber: {
+    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: '600',
+    letterSpacing: 2,
+    marginTop: 10,
+  },
+  cardBottom: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  cardLabel: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 10,
+    fontWeight: '600',
+    marginBottom: 4,
+    letterSpacing: 1,
+  },
+  cardValue: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  helpText: {
+    fontSize: 12,
+    color: '#8A8A9D',
+    lineHeight: 18,
+  },
+  bottomSection: {
+    alignItems: 'flex-end',
+    paddingHorizontal: 32,
+    paddingBottom: 20,
+  },
+  exploreButton: {
+    backgroundColor: '#7A47F5',
+    width: 160,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#7A47F5',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  exploreText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
+  },
 });

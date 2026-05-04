@@ -16,6 +16,8 @@ import { VerifyPhoneScreen } from '../screens/onboarding/VerifyPhoneScreen';
 import { VerifyOTPScreen } from '../screens/onboarding/VerifyOTPScreen';
 import { ResetOTPScreen } from '../screens/onboarding/ResetOTPScreen';
 import { ResetPasswordScreen } from '../screens/onboarding/ResetPasswordScreen';
+import { SetupAccountScreen } from '../screens/onboarding/SetupAccountScreen';
+import { AddWalletScreen } from '../screens/onboarding/AddWalletScreen';
 import { TermsScreen } from '../screens/onboarding/TermsScreen';
 import { SetupScreen } from '../screens/onboarding/SetupScreen';
 
@@ -70,6 +72,8 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="VerifyOTP" component={VerifyOTPScreen} />
         <Stack.Screen name="ResetOTP" component={ResetOTPScreen} />
         <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+        <Stack.Screen name="SetupAccount" component={SetupAccountScreen} />
+        <Stack.Screen name="AddWallet" component={AddWalletScreen} />
         <Stack.Screen name="Terms" component={TermsScreen} />
         <Stack.Screen name="Setup" component={SetupScreen} />
 

@@ -61,7 +61,7 @@ export const VerifyPhoneScreen: React.FC = () => {
         colors={['#FFF5F7', '#FCF8FF', '#FFFFFF']}
         style={StyleSheet.absoluteFillObject}
       />
-      
+
       <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
         {/* Header */}
         <View style={styles.header}>
@@ -78,7 +78,7 @@ export const VerifyPhoneScreen: React.FC = () => {
             {/* Country Selector */}
             <TouchableOpacity style={styles.countrySelector} onPress={() => setIsModalVisible(true)}>
               <View style={styles.flagWrapper}>
-                 <Image source={selectedCountry.flag} style={styles.flagIcon} resizeMode="cover" />
+                <Image source={selectedCountry.flag} style={styles.flagIcon} resizeMode="cover" />
               </View>
               <Ionicons name="chevron-down" size={16} color="#1E103A" style={styles.chevron} />
             </TouchableOpacity>

@@ -32,7 +32,7 @@ export const VerifyOTPScreen: React.FC = () => {
   };
 
   const handleNext = () => {
-    navigation.navigate('Setup');
+    navigation.navigate('SetupAccount');
   };
 
   const renderOtpBox = (index: number) => {
